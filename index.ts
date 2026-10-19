@@ -93,7 +93,7 @@ function persistStashHistory(history: string[]): void {
 
 	try {
 		mkdirSync(dirname(stashHistoryPath), { recursive: true });
-		writeFileSync(stashHistoryPath, JSON.stringify(payload, null, 2) + "\n");
+		writeFileSync(stashHistoryPath, `${JSON.stringify(payload, null, 2)}\n`);
 	} catch (error) {
 		console.debug(
 			`[editor-stash] Failed to persist stash history to ${stashHistoryPath}:`,
@@ -222,10 +222,18 @@ export default function (pi: ExtensionAPI) {
 		},
 	});
 
-	pi.on("session_start", (_event, ctx) => {
-		// active stash 是 session-local，切会话即弃；history 每次重读（pi-powerline :1752/:1760/:1769）
-		stashedEditorText = null;
-		stashHistory = readPersistedStashHistory();
-		if (ctx.hasUI) ctx.ui.setStatus(STATUS_KEY, undefined);
-	});
+	pi.on("session_start", (_event, ctx) => resetStashState(ctx));
+
+	// omp 的 /new、/resume 等会话切换不重发 session_start，改发 session_switch(reason: "new"/…)
+	// （agent-session.ts newSession → extensionRunner.emit session_switch）。pi 1.1.0 无此事件：
+	// 其 on() 是无校验的 map 注册，未知名只会成为永不触发的监听，运行时无害。
+	// @ts-expect-error pi 1.1.0 类型没有 session_switch 事件（omp 专属）
+	pi.on("session_switch", (_event, ctx) => resetStashState(ctx));
+}
+
+/** active stash 是 session-local，切会话即弃；history 每次重读（pi-powerline :1752/:1760/:1769） */
+function resetStashState(ctx: ExtensionContext): void {
+	stashedEditorText = null;
+	stashHistory = readPersistedStashHistory();
+	if (ctx.hasUI) ctx.ui.setStatus(STATUS_KEY, undefined);
 }
