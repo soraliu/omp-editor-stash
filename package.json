@@ -1,0 +1,45 @@
+{
+  "name": "omp-editor-stash",
+  "version": "0.1.0",
+  "description": "Pi/omp extension: Alt+S (Option+S) stash toggle for the editor draft, with a persisted stash history and /stash-history picker. Ported from pi-powerline-footer's editor stash.",
+  "keywords": [
+    "pi-package",
+    "pi",
+    "pi-extension",
+    "coding-agent",
+    "editor",
+    "stash"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/soraliu/omp-editor-stash.git"
+  },
+  "files": [
+    "index.ts",
+    "dev.ts",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "check": "tsc && biome check",
+    "dev": "node dev.ts",
+    "fix": "biome check --write"
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*",
+    "@earendil-works/pi-tui": "*"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.10",
+    "@earendil-works/pi-coding-agent": "^1.1.0",
+    "@earendil-works/pi-tui": "^1.1.0",
+    "typescript": "^5.9.0"
+  },
+  "pi": {
+    "extensions": [
+      "./index.ts"
+    ]
+  }
+}
